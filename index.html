@@ -46,14 +46,7 @@
 					>
 					<!-- Label -->
 					<span class="unitLabel"
-						  x-data="{
-							label: '',
-							update() {
-								if(unit.userName)
-									this.label = unit.userName + ': ' + ($store.resources.storage[this.resourceName] || 0).toFixed(0);
-							},
-							init() { this.update(); $watch('$store.resources.storage.'+resourceName, () => this.update()) }
-						}"
+						  x-data="alpineUnitLabel(unit)"
 						  x-text="label"
 					></span>
 					<button x-show="unit.config.addPerClick != null || unit.config.clickCallback!= null"
@@ -75,13 +68,7 @@
 					</button>
 					<!-- Passive info -->
 					<span class="unitInfo"
-					      x-data="{
-					        passive: '',
-					        printPassive(){
-					            let amount = gResources.get(this.resourceName);
-					            this.passive = amount == 0 ? '' : Resources.fancyPrintResource(unit.config.addPerSecond, amount, { showPlus: true });
-					        }
-						  }"
+					      x-data="alpineUnitInfo(unit)"
 					      x-show="passive"
 						  x-text="passive"
 						  x-effect="printPassive()" ></span>
@@ -102,14 +89,7 @@
 				>
 					<!-- Label -->
 					<span class="unitLabel"
-					      x-data="{
-						label: '',
-						update() {
-							if(unit.userName)
-								this.label = unit.userName + ': ' + ($store.resources.storage[this.resourceName] || 0).toFixed(0);
-						},
-						init() { this.update(); $watch('$store.resources.storage.'+resourceName, () => this.update()) }
-					}"
+					      x-data="alpineUnitLabel(unit)"
 					      x-text="label"
 					></span>
 					<button x-show="unit.config.addPerClick != null || unit.config.clickCallback!= null"
@@ -132,14 +112,8 @@
 					</button>
 					<!-- Passive info -->
 					<span class="unitInfo"
-					      x-data="{
-				        passive: '',
-				        printPassive(){
-				            let amount = gResources.get(this.resourceName);
-				            this.passive = amount == 0 ? '' : Resources.fancyPrintResource(unit.config.addPerSecond, amount, { showPlus: true });
-				        }
-					  }"
-					      x-show="passive"
+					      x-data="alpineUnitInfo(unit)"
+					      x-show="!$store.units[resourceName].btnDisabled && passive"
 					      x-text="passive"
 					      x-effect="printPassive()" ></span>
 				</div>

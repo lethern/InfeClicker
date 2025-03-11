@@ -91,7 +91,7 @@ class Resources{
 			let amount = resource[name] * mult;
 			if(string) string += ", ";
 			let amountStr = amount.toFixed(0);
-			if(amount < 1 && amount > 0) amountStr = amount.toFixed(1);
+			if(amount < 1 && amount > 0) amountStr = Resources.printNumber(amount, 1);
 
 			let name_output = Resources.resourceNames[name] || name;
 			string += `${amountStr} ${name_output}`;
@@ -106,7 +106,7 @@ class Resources{
 			let amount = resource[name] * mult;
 			if(string) string += ", ";
 			let amountStr = amount.toFixed(0);
-			if(amount < 1 && amount > 0) amountStr = amount.toFixed(1);
+			if(amount < 1 && amount > 0) amountStr = Resources.printNumber(amount, 1);
 
 			let name_output = Resources.resourceNames[name] || name;
 			if(amount > 0 && config.showPlus) string += '+';
@@ -114,9 +114,11 @@ class Resources{
 		}
 		return string;
 	}
+
+	static printNumber(number, digits = 0){
+		return number.toFixed(digits);
+	}
 }
-
-
 
 function calculateCostResources(cost, level){
 	let result = {};
@@ -128,10 +130,6 @@ function calculateCostResources(cost, level){
 	}
 	return result;
 }
-
-
-
-
 
 
 function gProduce(){
@@ -159,79 +157,6 @@ function gFirstBuilt(unitName){
 }
 
 
-
-/*
-	class TechUnit{
-
-		update(){
-			if(!this.enabled){
-				if(this.canEnable()) this.enable();
-				else return;
-			}
-
-			if(this.btn.disabled) return;
-
-			let customLabel = this.getCustomLabel();
-			if(customLabel){
-				this.label.textContent = customLabel;
-			}else{
-				this.label.textContent = `${this.userName}: ${this.amount.toFixed(0)}`;
-            }
-
-			let btnText = this.config.btnLabel || "Buy ";//+this.userName;
-
-			let cost = '';
-			let has = [];
-			if(this.config.clickCost){
-				let resources = calculateCostResources(this.config.clickCost, this.amount);
-				cost = Resources.printResource(resources);
-
-				for(let name in this.config.clickCost.resources){
-					let name_output = Resources.resourceNames[name] || name;
-					has.push(name_output+' '+gResources.get(name));
-				}
-			}
-
-			if(this.btn){
-				let string = btnText;
-				if(cost) string += ` (${cost})`;
-				this.btn.innerText = string;
-
-				let resources = calculateCostResources(this.config.clickCost, this.amount);
-				if(!this.btn.disabled && gResources.canAfford(resources)) {
-					this.btn.classList.add("afordable")
-				}else{
-					this.btn.classList.remove("afordable")
-                }
-
-				this.info.innerText = `Got: ${has.join(', ')}`;
-			}
-		}
-
-		getCustomLabel() {
-			switch(this.resourceName){
-				case "t_felages":{
-					if(this.amount == 1){
-                        return "Middle FelAges: done"
-                    }else{
-						return "Middle FelAges: "
-                    }
-				}break;
-			}
-		}
-	}
-*/
-/** @interface */
-class IClickerMechanic {
-	onClick() {}
-	produce() {}
-}
-
-
-
-/**
- * @implements {IClickerMechanic}
- */
 class ClickerUnitMechanic{
 	constructor(parent){
 		this.parent = parent;
@@ -252,7 +177,8 @@ class ClickerUnitMechanic{
 		if(works){
 			if(this.config.addPerClick){
 				gResources.add(this.config.addPerClick, 1)
-			}else if(this.config.clickCallback){
+			}
+			if(this.config.clickCallback){
 				this.config.clickCallback(this.parent);
 			}
 		}
@@ -266,7 +192,6 @@ class ClickerUnitMechanic{
 
 class ClickerUnit {
 	constructor(config, visible = false){
-
 		Resources.resourceNames[config.resourceName] = this.userName;
 
 		Alpine.store('units')[config.resourceName] = Alpine.reactive({
@@ -283,9 +208,6 @@ class ClickerUnit {
 		this.resourceName = store.resourceName;
 		this.config = store.config;
 
-		//this.visual = new ClickerUnitVisual(this);
-
-		/** @type {IClickerMechanic} */this.mechanic = undefined;
 		this.mechanic = new ClickerUnitMechanic(this);
 	}
 
@@ -293,7 +215,7 @@ class ClickerUnit {
 		return Alpine.store('units')[this.resourceName].visible
 	}
 	set visible(value){
-		if(Alpine.store('units')[this.resourceName].visible == value) return;
+		if(Alpine.store('units')[this.resourceName].visible === value) return;
 
 		Alpine.store('units')[this.resourceName].visible = value;
 
@@ -377,9 +299,63 @@ document.addEventListener('alpine:init', () => {
 		}
 	});
 
+	((function flags_and_messages() {
+		Alpine.store('flags', {
+			firstTimeTech: true,
+		});
+
+		Alpine.effect(() => {
+			const activeTab = Alpine.store('tabs').activeTab;
+			switch (activeTab) {
+				case 'Tech':
+					if (Alpine.store('flags').firstTimeTech) {
+						Alpine.store('flags').firstTimeTech = false;
+						gShowMessage("You enter FelHall, where smartest of Felhogs contemplate")
+					}
+					break;
+			}
+		});
+	})());
+
 	addGameUnits();
 
+	window.alpineUnitInfo = function (unit) {
+		return {
+			passive: '',
+			printPassive() {
+				let amount = gResources.get(this.resourceName);
+				this.passive = amount == 0 ? '' : Resources.fancyPrintResource(unit.config.addPerSecond, amount, {showPlus: true});
 
+				if (unit.config.tech && unit.config.clickCost) {
+					this.printTechHas();
+				}
+			},
+			printTechHas(){
+				let has = [];
+
+				for(let name in unit.config.clickCost.resources){
+					let name_output = Resources.resourceNames[name] || name;
+					has.push(name_output+' '+ Resources.printNumber(gResources.get(name)));
+				}
+				this.passive = `Got: ${has.join(', ')}`;
+			}
+		}
+	};
+	window.alpineUnitLabel = function (unit) {
+		return {
+			label: '',
+			update() {
+				if(unit.customLabel)
+					this.label = unit.customLabel;
+				else if(unit.userName)
+					this.label = unit.userName + ': ' + (Alpine.store('resources').storage[this.resourceName] || 0).toFixed(0);
+			},
+			init() {
+				this.update();
+				Alpine.effect(() => { this.update(); });
+			}
+		}
+	};
 
 	window.alpineClickerUnit = function (unit){
 		return {
@@ -437,7 +413,6 @@ document.addEventListener('alpine:init', () => {
 		setInterval(() => {
 			if(!gPaused){
 				gProduce();
-				//gExtraStuff();
 			}
 		}, 1000);
 	})());
@@ -446,58 +421,45 @@ document.addEventListener('alpine:init', () => {
 
 
 function addGameUnits() {
-	const shroudConfig = {
+	gUnits.push(new ClickerUnit({
 		userName: "Shroud",
 		resourceName: "shroud",
 		btnLabel: "Spread Shroud",
 		addPerClick: {"shroud": 1}
-	}
-	gUnits.push(new ClickerUnit(shroudConfig, true));
+	}, true));
 
-	const ShroudstoneConfig = {
+	gUnits.push(new ClickerUnit({
 		userName: "Shroudstone",
 		resourceName: "shroudstone",
 		addPerSecond: {"shroud": 1},
 		clickCost: { resources: {"shroud": 10}, multiplier: 1.1 },
 		addPerClick: {"shroudstone": 1},
 		unlockCondition: { resources: { "shroud": 5 }}
-	}
-	gUnits.push(new ClickerUnit(ShroudstoneConfig));
+	}));
 
-	const meatFarmConfig = {
+	gUnits.push(new ClickerUnit({
 		userName: "Meat Farm",
 		resourceName: "meatfarm",
 		clickCost: { resources: {"shroud": 20}, multiplier: 1.1 },
 		addPerClick: {"meatfarm": 1},
 		addPerSecond: {"felhog": 0.1},
 		unlockCondition: { resources: { "shroud": 20 }, message: "Boss! Shroud is works! We seeing meat farm next hill!"}
-	}
-	gUnits.push(new ClickerUnit(meatFarmConfig));
+	}));
 
-
-
-	const FelhogConfig = {
+	gUnits.push(new ClickerUnit({
 		userName: "Felhog",
 		resourceName: "felhog",
 		addPerSecond: {"animus": 0.1},
 		unlockCondition: { resources: { "felhog": 1 }}
-	}
-	gUnits.push(new ClickerUnit(FelhogConfig));
+	}));
 
-	const AnimusConfig = {
+	gUnits.push(new ClickerUnit({
 		userName: "Animus",
 		resourceName: "animus",
 		//clickCost: { resources: {"felhog": 1} },
 		//addPerClick: {"fiend": 1},
 		unlockCondition: { resources: { "animus": 10 }, message: "This energy gives us lots of strong!"}
-	}
-	gUnits.push(new ClickerUnit(AnimusConfig));
-
-	//function gExtraStuff() {
-	//	if(!gExtras.tech && gResources.canAfford({"animus": 75})){
-	//		addTech()
-	//	}
-	//}
+	}));
 
 	gUnits.push(new ClickerUnit({
 		userName: "",
@@ -514,53 +476,37 @@ function addGameUnits() {
 		unlockCondition: { resources: { "animus": 75 }}
 	}));
 
-	/*
-	let div = addDiv(gUnitsDiv, 'unitRow');
-	let btn = addBtn(div, ()=>advance(), "Build FelHall (Animus: 100)");
-	gExtras.tech = { div, btn };
-	function advance(){
-		gResources.add({"tech": 1});
-		Tabs.addTab('tech');
-		gResources.sub({"animus": 100});
-		div.style.display = "none";
-	}
-	 */
-
-	const NobleFelhogConfig = {
+	gUnits.push(new ClickerUnit({
 		userName: "Noble Felhog",
 		resourceName: "noblefelhog",
 		clickCost: { resources: {"felhog": 10} },
 		addPerClick: {"noblefelhog": 1},
 		unlockCondition: { resources: { "tech": 2 }, message: "We be advanced now!"}
-	}
-	gUnits.push(new ClickerUnit(NobleFelhogConfig));
+	}));
 
 
-	const FelhogqueenConfig = {
+	gUnits.push(new ClickerUnit({
 		userName: "Felhog Queen",
 		resourceName: "felhogqueen",
 		clickCost: { resources: {"noblefelhog": 20}, multiplier: 1.2 },
 		addPerClick: {"felhogqueen": 1},
 		addPerSecond: {"noblefelhog": 1},
 		unlockCondition: { resources: { "tech": 2, "noblefelhog": 10 }}
-	}
-	gUnits.push(new ClickerUnit(FelhogqueenConfig));
+	}));
 
 
 	gTechs.push(new ClickerUnit({
+		tech: true,
 		userName: "Advance to Middle FelAges",//  (Animus: 100
 		resourceName: "t_felages",
 		clickCost: { resources: {"animus": 200}, multiplier: 1 },
 		clickCallback (unit) {
 			gResources.add(unit.resourceName, 1)
 			Alpine.store('units')[unit.resourceName].btnDisabled = true;
-			//visual.btn.disabled = true;
-			//visual.btn.classList.remove("afordable")
-			//visual.info.innerText = '';
-			//visual.label.textContent = "Middle FelAges: done";
 
 			gResources.add({"tech": 1});
 			document.body.classList.add("felages");
+			unit.customLabel = "Middle FelAges: done";
 		},
 		unlockCondition: { resources: { "tech": 1 }}
 	}))
