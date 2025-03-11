@@ -1,6 +1,11 @@
 
 body { font-family: Arial, sans-serif; text-align: center; }
-.title{ user-select: none; }
+.title{
+	user-select: none;
+	padding: 15px 0;
+	font-weight: bold;
+	vertical-align: middle;
+}
 .container { margin-top: 30px; width: 80vw;	height: 93vh; margin: auto; overflow:auto; }
 .felages .container {
 	box-shadow: inset 1px 1px 36px -12px rgba(107, 39, 0, 1);
@@ -46,6 +51,60 @@ button {
 	background-color: #dbd4a7 !important;
 	box-shadow: 0px 0px 9px -4px #c5927a !important;
 }
+
+.felages .messageClose{
+	background: #7f5050;
+}
+
+/* tabs */
+#tabs{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 10px;
+}
+#tabs_content{
+	min-width: 500px;
+	padding: 6px 20px;
+	background: #f2f5f7;
+	box-shadow: 0px 0px 12px -2px #5f9dbd;
+	display: flex;
+	align-items: flex-start;
+	border-radius: 6px;
+	user-select: none;
+}
+#tabs button {
+	cursor: pointer;
+	background: #d1efff;
+	font-family: 'Consolas';
+	font-size: 1.1em;
+	padding: 2px 6px;
+	border-radius: 3px;
+	margin-right: 10px;
+}
+#tabs button.active {
+	cursor: pointer;
+	background: #098acd;
+	color: #ffffff;
+	font-family: 'Consolas';
+	font-size: 1.1em;
+	padding: 2px 6px;
+	border-radius: 3px;
+}
+.hidden{
+	display: none;
+}
+.affordable{
+	border: 1px solid #9daf98;
+	background-color: #d2ffcc;
+}
+
+/** Messages */
+
+#msgs{
+	user-select: none;
+}
+
 .message{
 	position: relative;
 	padding: 10px;
@@ -80,51 +139,8 @@ button {
 	cursor: pointer;
 	border-radius: 3px;
 }
-.felages .messageClose{
-	background: #7f5050;
-}
 
-#tabs_container{
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	margin-bottom: 10px;
-}
-#tabs{
-	min-width: 500px;
-	padding: 6px 20px;
-	background: #f2f5f7;
-	box-shadow: 0px 0px 12px -2px #5f9dbd;
-	display: flex;
-	align-items: flex-start;
-	border-radius: 6px;
-	user-select: none;
-}
-#tabs > span {
-	cursor: pointer;
-	background: #d1efff;
-	font-family: 'Consolas';
-	font-size: 1.1em;
-	padding: 2px 6px;
-	border-radius: 3px;
-	margin-right: 10px;
-}
-#tabs > span.active {
-	cursor: pointer;
-	background: #098acd;
-	color: #ffffff;
-	font-family: 'Consolas';
-	font-size: 1.1em;
-	padding: 2px 6px;
-	border-radius: 3px;
-}
-.hidden{
-	display: none;
-}
-.afordable{
-	border: 1px solid #9daf98;
-	background-color: #d2ffcc;
-}
-#msgs{
-	user-select: none;
+[x-transition] {
+	opacity: 1;
+	transform: translateY(0);
 }
