@@ -1,4 +1,3 @@
-let mainDiv = document.getElementById("main");
 let gUnits = [];
 let gTechs = [];
 
@@ -133,7 +132,8 @@ function calculateCostResources(cost, level){
 
 
 function gProduce(){
-	gUnits.forEach(unit => unit.produce());
+	for(const unit of gUnits)
+		unit.produce();
 }
 
 function gShowMessage(message){
@@ -150,9 +150,10 @@ function gFirstBuilt(unitName){
 	let time = Date.now();
 	let dt = 0;
 	if(gLastTime){
-		dt = time- gLastTime;
+		dt = time - gLastTime;
 	}
 	gLastTime = time;
+	// eslint-disable-next-line no-console
 	console.log("first " + unitName + " on " + (timeFormatter.format(time)) + ", "+ (dt/1000));
 }
 
@@ -245,7 +246,7 @@ document.addEventListener('alpine:init', () => {
 
 	window.gResources = new Resources();
 
-	((function tabs(){
+	(function tabs(){
 		Alpine.store('tabs', {
 			tabsVisible: false,
 			activeTab: 'Main',
@@ -267,10 +268,7 @@ document.addEventListener('alpine:init', () => {
 		Alpine.data('tabs', () => ({
 			tabs: Alpine.store('tabs').tabs
 		}))
-	})());
-
-	((function x(){
-	})());
+	})();
 
 	Alpine.data('clickerUnits', () => ({
 		units: [],
@@ -404,7 +402,7 @@ document.addEventListener('alpine:init', () => {
 		};
 	};
 
-	((function setup(){
+	(function setup(){
 		const params = new URLSearchParams(window.location.search);
 		if (params.has('dev')) {
 			Alpine.store('resources').add({shroud: 1000, shroudstone: 100, animus: 600});
@@ -415,7 +413,7 @@ document.addEventListener('alpine:init', () => {
 				gProduce();
 			}
 		}, 1000);
-	})());
+	})();
 
 });
 
@@ -510,18 +508,4 @@ function addGameUnits() {
 		},
 		unlockCondition: { resources: { "tech": 1 }}
 	}))
-}
-
-
-
-/* helpers */
-
-let AlpineObjectMap = {};
-function AlpineObject(name){
-	if(!AlpineObjectMap[name]){
-		let elem = document.getElementById(name);
-		if(!elem) throw new Error("AlpineObject: can't find by Id '"+name+"'");
-		AlpineObjectMap[name] = Alpine.$data(elem);
-	}
-	return AlpineObjectMap[name];
 }
