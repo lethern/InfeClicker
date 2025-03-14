@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@types/alpinejs": "^3.13.11"
+  }
+}

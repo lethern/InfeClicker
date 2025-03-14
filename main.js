@@ -1,34 +1,12 @@
+// plugins: https://alpinejs.dev/plugins/collapse
+// import Alpine from "alpinejs";
+/** @type {import('alpinejs').Alpine} */
+const Alpine = window.Alpine;
+
 let gUnits = [];
 let gTechs = [];
 
 let gPaused = false;
-
-/*
-1. zmieniamy klasy zeby rozdzielic logike od visual
- logike musimy miec w jednym miejscu, latwe do edycji, wszystkie tech i mnozniki itd.
-2. okreslamy liste "nastepnych celi" (przy czym na samym poczatku moze byc ciezej, bo trzeba
- manualnie wpisac np. 20 lvl #1 i 20 lvl #2
- dalsze cele okreslamy jako np. "kupic tech1"
- cele mają też whitelist innych units ktore mozna kupowac w trakcie czekania
-3. jesli aktualny cel nie mozemy zrobic, to algorytm oblicza co jest potrzebne (np. tech1 -> X animus)
- robimy petle, w ktorej kazdy krok to 1 sekunda
-  - dodajemy zasoby za te sekunde
-  - sprawdzamy czy mozemy kupic cel
-  - sprawdzamy czy mozemy kupic inne rzeczy (uwaga: cel powinien miec liste rzeczy, ktore mozemy
-	 kupowac. inaczej kupujac losowo, mozemy tracic zasoby ktore probujemy zbierać)
-na kazdy cel zapisujemy czas uzyskania i zrzut memory (resources i units)
-->
-dodajemy nowe elementy
- -sacrifice (poswiecanie units zeby zwiekszyc ich wydajnosc)
- -noble felhog (ale nie robiony z animus, tylko)
- pozniej:
- -impy (resources)
- -jednostki (za resources)
- -expansje (uzywamy jednostek zeby rozszerzac itd.)
-->
-testujemy timingi:
-odpalamy i zmieniamy, az timingi beda pasować
-* */
 
 
 
@@ -322,7 +300,7 @@ document.addEventListener('alpine:init', () => {
 			passive: '',
 			printPassive() {
 				let amount = gResources.get(this.resourceName);
-				this.passive = amount == 0 ? '' : Resources.fancyPrintResource(unit.config.addPerSecond, amount, {showPlus: true});
+				this.passive = (amount === 0) ? '' : Resources.fancyPrintResource(unit.config.addPerSecond, amount, {showPlus: true});
 
 				if (unit.config.tech && unit.config.clickCost) {
 					this.printTechHas();
@@ -349,7 +327,6 @@ document.addEventListener('alpine:init', () => {
 					this.label = unit.userName + ': ' + (Alpine.store('resources').storage[this.resourceName] || 0).toFixed(0);
 			},
 			init() {
-				this.update();
 				Alpine.effect(() => { this.update(); });
 			}
 		}
