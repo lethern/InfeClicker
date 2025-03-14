@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "import",
+    "oxc",
+    "promise",
+    "unicorn"
+  ],
+  "categories": {
+    "correctness": "error",
+    "perf": "warn",
+    "restriction": "warn",
+    "suspicious": "warn",
+    "nursery": "warn"
+  },
+  "rules": {
+    "consistent-function-scoping": "allow",
+    "default-case": "allow",
+    "no-undefined": "allow",
+    "unambiguous": "allow"
+  },
+  "globals": {
+    "Alpine": "readonly",
+    "gResources": "readonly"
+  },
+  "env": {
+    "builtin": true,
+    "browser": true,
+    "es6": true
+  }
+}
