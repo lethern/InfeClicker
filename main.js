@@ -1,7 +1,7 @@
 // plugins: https://alpinejs.dev/plugins/collapse
 // import Alpine from "alpinejs";
 /** @type {import('alpinejs').Alpine} */
-const Alpine = window.Alpine;
+window.Alpine;
 
 let gUnits = [];
 let gTechs = [];
