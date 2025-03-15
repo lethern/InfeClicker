@@ -9,15 +9,11 @@
   "categories": {
     "correctness": "error",
     "perf": "warn",
-    "restriction": "warn",
     "suspicious": "warn",
     "nursery": "warn"
   },
   "rules": {
-    "consistent-function-scoping": "allow",
-    "default-case": "allow",
-    "no-undefined": "allow",
-    "unambiguous": "allow"
+    "consistent-function-scoping": "allow"
   },
   "globals": {
     "Alpine": "readonly",

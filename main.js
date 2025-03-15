@@ -1,6 +1,4 @@
 // plugins: https://alpinejs.dev/plugins/collapse
-// import Alpine from "alpinejs";
-/* eslint-disable no-unused-expressions */
 /** @type {import('alpinejs').Alpine} */
 window.Alpine;
 
